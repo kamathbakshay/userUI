@@ -2,29 +2,69 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <title>Three.js Tutorials by Sean Bradley : https://sbcode.net/threejs/</title>    
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        body {
-            overflow: hidden;
-            margin: 0px;
-        }
-    </style>
-    <script type="importmap">
-        {
-          "imports": {
-            "three": "./build/three.module.js",
-            "three/examples/jsm/controls/OrbitControls":"./jsm/controls/OrbitControls.js",
-            "three/examples/jsm/libs/stats.module":"./jsm/libs/stats.module.js",
-            "three/examples/jsm/libs/dat.gui.module":"./jsm/libs/dat.gui.module.js"
-          }
-        }
-    </script>
+  <meta charset="utf-8">
+  <title>Feedback Tool</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      background-color: white;
+    }
+
+    .canvas-container canvas {
+      position: fixed;
+      /* padding-left: 25%; */
+    }
+    .heading {
+      
+    }
+
+    .wrapper {
+      margin: auto;
+      text-align: center;
+      width: 100%;
+      
+    }
+
+    .submit {
+      color: black;
+      background-color: lightcyan;
+      padding: 15px 50px;
+      margin: 10px 4px;
+      font-family: sans-serif;
+      text-transform: uppercase;
+      text-align: center;
+      position: relative;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .input {
+      text-align: left;
+      padding: 10px 50px;
+      margin: 10px 4px;
+    }
+  </style>
+
 </head>
 
 <body>
-    <script type="module" src="client.js"></script>
+
+  <div class="wrapper">
+    <h1 class="heading" id="heading">Enter the Survey Id</h1>
+    <form>
+      <input type="text" id="surveyId" class="input" name="surveyId"><br>
+    </form>
+    <!-- <a href="index.html"><input type="submit" value="Submit" id="submitBtn"></a>
+         -->
+    <!-- <button class="submit"><a href="index.html">Submit</a></button> -->
+    <button id="submit">Submit</a></button>
+  </div>
+
+  <script src="index.js"></script>
+
+
+
+
 </body>
 
 </html>
