@@ -638,6 +638,7 @@
 // //     num++;
 // // });
 
+
 async function submitScore(score, surveyId) {
     const requestOptions = {
         method: "PUT",
