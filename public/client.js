@@ -647,7 +647,7 @@ async function submitScore(score, surveyId) {
             "score": String(score)
         }),
     };
-    const response = await fetch("http://localhost:3002/testrealput", requestOptions);
+    const response = await fetch("http://3.110.115.83:3002/testrealput", requestOptions);
 
     const json = await response.json()
     console.log('json response:', json);
