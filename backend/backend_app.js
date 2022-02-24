@@ -67,7 +67,7 @@ app2.put('/testrealput', jsonParser, async function(request, response) {
     response.json(data);
 });
 
-app2.get('/getQuestion', jsonParser, async function(request, response) {
+app2.get('/proxy/getQuestion', jsonParser, async function(request, response) {
     // response.send("surveyId is set to " + request.query.surveyId);
     const surveyId = request.query.surveyId;
 
