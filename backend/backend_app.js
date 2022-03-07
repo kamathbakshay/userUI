@@ -51,7 +51,7 @@ app2.get('/testput', async (request, response) => {
     // console.warn(response);
 });
 
-app2.put('/testrealput', jsonParser, async function(request, response) {
+app2.put('/proxy/testrealput', jsonParser, async function(request, response) {
 
     const requestOptions = {
         method: "PUT",

@@ -647,7 +647,7 @@ async function submitScore(score, surveyId) {
             "score": String(score)
         }),
     };
-    const response = await fetch("http://13.233.14.203:3002/testrealput", requestOptions);
+    const response = await fetch("https://lb.anonsurvey.xyz/proxy/testrealput", requestOptions);
    
     const json = await response.json()
     console.log('json response:', json);
