@@ -13,8 +13,8 @@ app.use('/images', express.static(path.join(__dirname, '/images')));
 
 app.engine('html', require('ejs').renderFile);
 
-// const port1 = 3000;
-const port1 = 80;
+const port1 = 3000;
+// const port1 = 80;
 app.listen(port1, () => {
     console.log(`Started clientSider server on ${port1}`)
 });
