@@ -1,7 +1,7 @@
 
 async function getQuestion(surveyId) {
     const responsejson = await fetch(
-        "http://localhost:3002/getQuestion?surveyId=" + surveyId  
+        "https://lb.anonsurvey.xyz/proxy/getQuestion?surveyId=" + surveyId  
     );
 
     const data = await responsejson.json()
