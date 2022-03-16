@@ -1,66 +1,101 @@
 import * as THREE from 'three'
-// import { GLTFLoader } from '/jsm/loaders/GLTFLoader.js'
 
-// import * as THREE from '/build/three.module.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 
-// import Stats from 'three/examples/jsm/libs/stats.module'
-// import { GUI } from 'three/examples/jsm/libs/dat.gui.module'
+let output = null;
+let model = null;
+let renderer = null;
+let scene = null;
+let camera = null;
+let glasses = null;
+let canvas = null;
+let textureLoader = null;
+let gltfmodel = null;
+let mesh = null;
+let head = null;
+let pause = false;
+let smile_level = 1;
 
-// const scene = new THREE.Scene()
-
-// const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100)
-// camera.position.z = 2
-
-// const renderer = new THREE.WebGLRenderer()
-// renderer.setSize(window.innerWidth, window.innerHeight)
-// document.body.appendChild(renderer.domElement)
-
-// const controls = new OrbitControls(camera, renderer.domElement)
-
-// const geometry = new THREE.BoxGeometry()
-// const material = new THREE.MeshBasicMaterial({
-//     color: 0x00ff00,
-//     wireframe: true,
-// })
-// const cube = new THREE.Mesh(geometry, material)
-// scene.add(cube)
+let map = null, material = null, geometry = null;
 
 
-// const stats = Stats()
-// document.body.appendChild(stats.dom)
+// instantiate a texture loader
+var loader = new THREE.TextureLoader();
+//allow cross origin loading
+loader.crossOrigin = '';
 
-// const gui = new GUI()
-// const cubeFolder = gui.addFolder('Cube')
-// cubeFolder.add(cube.scale, 'x', -5, 5)
-// cubeFolder.add(cube.scale, 'y', -5, 5)
-// cubeFolder.add(cube.scale, 'z', -5, 5)
-// cubeFolder.open()
-// const cameraFolder = gui.addFolder('Camera')
-// cameraFolder.add(camera.position, 'z', 0, 10)
-// cameraFolder.open()
+function init() {
 
-// function animate() {
-//     requestAnimationFrame(animate)
-//     cube.rotation.x += 0.01
-//     cube.rotation.y += 0.01
-//     controls.update()
-//     render()
-//     stats.update()
-// }
+  const container = document.createElement( 'div' );
+  document.body.appendChild( container );
 
-// function render() {
-//     renderer.render(scene, camera)
-// }
+  camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
+  camera.position.set( 0, 0, 10 );
 
-// animate()
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color( 0xbbbbbb );
 
-// import * as THREE from './web/build/three.module.js';
-// // import { OrbitControls } from './web/examples/jsm/controls/OrbitControls.js';
-// import { GLTFLoader } from './web/examples/jsm/loaders/GLTFLoader.js';
-// // import { MeshoptDecoder } from './web/examples/jsm/libs/meshopt_decoder.module.js';
-// // import { FBXLoader } from './web/examples/jsm/loaders/FBXLoader.js';
+  new RGBELoader()
+    .setPath( '/model/texture/' )
+    .load( 'royal_esplanade_1k.hdr', function ( texture ) {
+
+      texture.mapping = THREE.EquirectangularReflectionMapping;
+
+      // scene.background = texture;
+      scene.environment = texture;
+
+      render();
+
+      // model
+
+      const loader = new GLTFLoader().setPath( '/model/' );
+      loader.load( 'skull4.4.glb', function ( gltf ) {
+
+        scene.add( gltf.scene );
+
+        render();
+
+      } );
+
+    } );
+
+  renderer = new THREE.WebGLRenderer( { antialias: true } );
+  renderer.setPixelRatio( window.devicePixelRatio );
+  renderer.setSize( window.innerWidth, window.innerHeight );
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1;
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  container.appendChild( renderer.domElement );
+
+  const controls = new OrbitControls( camera, renderer.domElement );
+  controls.addEventListener( 'change', render ); // use if there is no animation loop
+  controls.minDistance = 2;
+  controls.maxDistance = 10;
+  controls.target.set( 0, 0, - 0.2 );
+  controls.update();
+
+  window.addEventListener( 'resize', onWindowResize );
+
+}
+
+function onWindowResize() {
+
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize( window.innerWidth, window.innerHeight );
+
+  render();
+
+}
+
+//
+
+function render() {
+  renderer.render( scene, camera );
+}
 
 function setText( text ) {
     document.getElementById( "status" ).innerText = text;
@@ -106,27 +141,6 @@ async function setupWebcam() {
     });
 }
 
-let output = null;
-let model = null;
-let renderer = null;
-let scene = null;
-let camera = null;
-let glasses = null;
-let canvas = null;
-let textureLoader = null;
-let gltfmodel = null;
-let mesh = null;
-let head = null;
-let pause = false;
-let smile_level = 1;
-
-let map = null, material = null, geometry = null;
-
-
-// instantiate a texture loader
-var loader = new THREE.TextureLoader();
-//allow cross origin loading
-loader.crossOrigin = '';
 
 function loadModel( file ) {
     return new Promise( ( res, rej ) => {
@@ -467,117 +481,205 @@ async function trackFace() {
     requestAnimationFrame( trackFace );
 }
 
+function addLights (object) {
+  const box = new THREE.Box3().setFromObject(object);
+  const size = box.getSize(new THREE.Vector3()).length();
+  const center = box.getCenter(new THREE.Vector3());
+
+  const state = {
+      background: false,
+      playbackSpeed: 1.0,
+      actionStates: {},
+      wireframe: false,
+      skeleton: false,
+      grid: false,
+
+      // Lights
+      addLights: true,
+      exposure: 1.0,
+      textureEncoding: 'sRGB',
+      ambientIntensity: 0.3,
+      ambientColor: 0xFFFFFF,
+      directIntensity: 0.8 * Math.PI, // TODO(#116)
+      directColor: 0xFFFFFF,
+      bgColor1: '#ffffff',
+      bgColor2: '#353535'
+    };
+
+  // if (this.options.preset === Preset.ASSET_GENERATOR) {
+  //   const hemiLight = new HemisphereLight();
+  //   hemiLight.name = 'hemi_light';
+  //   this.scene.add(hemiLight);
+  //   this.lights.push(hemiLight);
+  //   return;
+  // }
+
+  const light1  = new THREE.AmbientLight(state.ambientColor, state.ambientIntensity);
+  light1.name = 'ambient_light';
+  camera.add( light1 );
+
+  const light2  = new THREE.DirectionalLight(state.directColor, state.directIntensity);
+  // light2.position.set(0.5 * size * 3, 0, 0.866 * size * 3); // ~60º
+  light2.position.set(0,1,0); // ~60º
+  light2.name = 'main_light';
+  camera.add( light2 );
+
+  const plight1 = new THREE.PointLight(0xc4c4c4,10);
+  plight1.position.set(size + 0,size + 300,size + 500);
+  scene.add(plight1);
+  //
+  // const plight2 = new THREE.PointLight(0xc4c4c4,10);
+  // plight2.position.set(size + 500,size + 100,size + 0);
+  // scene.add(plight2);
+  //
+  // const plight3 = new THREE.PointLight(0xc4c4c4,10);
+  // plight3.position.set(size + 0,size + 100,-size + -500);
+  // scene.add(plight3);
+  //
+  // const plight4 = new THREE.PointLight(0xc4c4c4,10);
+  // plight4.position.set(-size + -500,size + 300,size + 500);
+  // scene.add(plight4);
+
+  // this.lights.push(light1, light2);
+}
+
+function setCamPosition( object ) {
+  const box = new THREE.Box3().setFromObject(object);
+  const size = box.getSize(new THREE.Vector3()).length();
+  const center = box.getCenter(new THREE.Vector3());
+
+  // object.position.x += (object.position.x - center.x);
+  // object.position.y += (object.position.y - center.y);
+  // object.position.z += (object.position.z - center.z);
+
+  camera.near = size / 100;
+  camera.far = size * 100;
+  camera.updateProjectionMatrix();
+
+  camera.position.copy(center);
+  // camera.position.x += size / 2.0;
+  // camera.position.y += size / 5.0;
+  // camera.position.z += size / 2.0;
+
+  camera.position.z += size;
+  camera.lookAt(center);
+}
+
 async function main() {
-    await setupWebcam();
-    const video = document.getElementById( "webcam" );
-    video.play();
-    let videoWidth = video.videoWidth;
-    let videoHeight = video.videoHeight;
-    video.width = videoWidth;
-    video.height = videoHeight;
-
-    canvas = document.getElementById( "output" );
-    canvas.width = video.width;
-    canvas.height = video.height;
-
-    let overlay = document.getElementById( "overlay" );
-    overlay.width = video.width;
-    overlay.height = video.height;
-
-    output = canvas.getContext( "2d" );
-    output.translate( canvas.width, 0 );
-    output.scale( -1, 1 ); // Mirror cam
-    output.fillStyle = "#fdffb6";
-    output.strokeStyle = "#fdffb6";
-    output.lineWidth = 2;
-
-    // Load Face Landmarks Detection
-    model = await faceLandmarksDetection.load(
-        faceLandmarksDetection.SupportedPackages.mediapipeFacemesh
-    );
-
-    renderer = new THREE.WebGLRenderer({
-        canvas: document.getElementById( "overlay" ),
-        alpha: true
-    });
-
-    // camera = new THREE.PerspectiveCamera( 45, 1, 0.1, 2000 );
-    camera = new THREE.PerspectiveCamera(40,window.innerWidth/window.innerHeight,1,5000);
-
-    // camera.aspect = window.innerWidth / window.innerHeight;
-
-    // camera.position.x = videoWidth / 2;
-    // camera.position.y = -videoHeight / 2;
-    // camera.position.z = -( videoHeight / 2 ) / Math.tan( 45 / 2 ); // distance to z should be tan( fov / 2 )
-
-    camera.position.set(0,30,0);
-    // camera.up = new THREE.Vector3(1,1,0);
-    camera.lookAt(new THREE.Vector3(0,0,0));
-
-    // camera.position.x = 800;
-    // camera.position.y = 100;
-    // camera.position.z = 1000;
-
-    console.log('cam x:', camera.position.x);
-    console.log('cam y:', camera.position.y);
-    console.log('cam z:', camera.position.z);
-    // cam x: 320
-    // cam y: -240
-    // cam z: -430.22183686063295
-    // camera.position.set( -30, -1, 1 );
-    // camera.position.set( 320, -240, -430.22183686063295 );
-    // camera.position.set( 320, -240, -2000 );
-
-    console.log('cam x:', camera.position.x);
-    console.log('cam y:', camera.position.y);
-    console.log('cam z:', camera.position.z);
-
-    scene = new THREE.Scene();
-    scene.add( new THREE.AmbientLight( 0xcccccc, 0.4 ) );
-    camera.add( new THREE.PointLight( 0xffffff, 0.8 ) );
-    scene.add( camera );
-
-    // camera.lookAt( { x: videoWidth / 2, y: -videoHeight / 2, z: 0, isVector3: true } );
-
-    glasses = await loadModel( "/model/skull3.2.glb" );
-    // let obj = glasses.children[0];
-    // obj.scale.set(0.5,0.5,0.5);
-    scene.add( glasses );
-
-    console.log('glasses:', glasses);
-    // let object=glasses.animation;
-    // console.log('object:', object);
-
-    head = glasses.getObjectByName( 'head_1' );
-    // let cube = head.getObjectByName('Cube');
-    console.log('head:', head);
-    // console.log('cube:', cube);
-
-
-    //sad
-    // head.morphTargetInfluences[1] = 0;
-    // head.morphTargetInfluences[2] = 0;
-    // head.morphTargetInfluences[3] = 1;
-
-    //smile
-    // head.morphTargetInfluences[1] = 1;
-    // head.morphTargetInfluences[2] = 0;
-    // head.morphTargetInfluences[3] = 0;
-
-    //smile more
-    // head.morphTargetInfluences[1] = 1;
-    // head.morphTargetInfluences[2] = 1;
-    // head.morphTargetInfluences[3] = 0;
-
-
-    // console.log('morphTarget:', head.morphTargetInfluences[1]);
-
-    setText( "Loaded!" );
-    camera.aspect = window.innerWidth / window.innerHeight
-    camera.updateProjectionMatrix()
-    renderer.setSize(window.innerWidth, window.innerHeight)
-
-    trackFace();
+    // await setupWebcam();
+    // const video = document.getElementById( "webcam" );
+    // video.play();
+    // let videoWidth = video.videoWidth;
+    // let videoHeight = video.videoHeight;
+    // video.width = videoWidth;
+    // video.height = videoHeight;
+    //
+    // canvas = document.getElementById( "output" );
+    // canvas.width = video.width;
+    // canvas.height = video.height;
+    //
+    // let overlay = document.getElementById( "overlay" );
+    // overlay.width = video.width;
+    // overlay.height = video.height;
+    //
+    // output = canvas.getContext( "2d" );
+    // output.translate( canvas.width, 0 );
+    // output.scale( -1, 1 ); // Mirror cam
+    // output.fillStyle = "#fdffb6";
+    // output.strokeStyle = "#fdffb6";
+    // output.lineWidth = 2;
+    //
+    // // Load Face Landmarks Detection
+    // model = await faceLandmarksDetection.load(
+    //     faceLandmarksDetection.SupportedPackages.mediapipeFacemesh
+    // );
+    //
+    // renderer = new THREE.WebGLRenderer({
+    //     canvas: document.getElementById( "overlay" ),
+    //     alpha: true
+    // });
+    //
+    // // camera = new THREE.PerspectiveCamera( 45, 1, 0.1, 2000 );
+    // const fov = 0.8 * 180 / Math.PI;
+    // camera = new THREE.PerspectiveCamera(fov , window.innerWidth/window.innerHeight, 0.01, 1000 );
+    // // camera.aspect = window.innerWidth / window.innerHeight;
+    //
+    // // camera.position.x = videoWidth / 2;
+    // // camera.position.y = -videoHeight / 2;
+    // // camera.position.z = -( videoHeight / 2 ) / Math.tan( 45 / 2 ); // distance to z should be tan( fov / 2 )
+    //
+    // // camera.position.set(0,30,0);
+    // // // camera.up = new THREE.Vector3(1,1,0);
+    // // camera.lookAt(new THREE.Vector3(0,0,0));
+    //
+    // // camera.position.x = 800;
+    // // camera.position.y = 100;
+    // // camera.position.z = 1000;
+    //
+    // console.log('cam x:', camera.position.x);
+    // console.log('cam y:', camera.position.y);
+    // console.log('cam z:', camera.position.z);
+    // // cam x: 320
+    // // cam y: -240
+    // // cam z: -430.22183686063295
+    // // camera.position.set( -30, -1, 1 );
+    // // camera.position.set( 320, -240, -430.22183686063295 );
+    // // camera.position.set( 320, -240, -2000 );
+    //
+    // console.log('cam x:', camera.position.x);
+    // console.log('cam y:', camera.position.y);
+    // console.log('cam z:', camera.position.z);
+    //
+    // scene = new THREE.Scene();
+    // scene.background = new THREE.Color( "#77ff70" );
+    // // scene.add( new THREE.AmbientLight( 0xcccccc, 0.4 ) );
+    // // camera.add( new THREE.PointLight( 0xffffff, 0.8 ) );
+    //
+    // // camera.lookAt( { x: videoWidth / 2, y: -videoHeight / 2, z: 0, isVector3: true } );
+    //
+    // glasses = await loadModel( "/model/skull4.3.glb" );
+    // scene.add(glasses);
+    // setCamPosition(glasses)
+    // addLights(glasses)
+    //
+    // scene.add( camera );
+    //
+    // console.log('glasses:', glasses);
+    // // let object=glasses.animation;
+    // // console.log('object:', object);
+    //
+    // head = glasses.getObjectByName( 'head_1' );
+    // // let cube = head.getObjectByName('Cube');
+    // console.log('head:', head);
+    // // console.log('cube:', cube);
+    //
+    //
+    // //sad
+    // // head.morphTargetInfluences[1] = 0;
+    // // head.morphTargetInfluences[2] = 0;
+    // // head.morphTargetInfluences[3] = 1;
+    //
+    // //smile
+    // // head.morphTargetInfluences[1] = 1;
+    // // head.morphTargetInfluences[2] = 0;
+    // // head.morphTargetInfluences[3] = 0;
+    //
+    // //smile more
+    // // head.morphTargetInfluences[1] = 1;
+    // // head.morphTargetInfluences[2] = 1;
+    // // head.morphTargetInfluences[3] = 0;
+    //
+    //
+    // // console.log('morphTarget:', head.morphTargetInfluences[1]);
+    //
+    // setText( "Loaded!" );
+    // camera.aspect = window.innerWidth / window.innerHeight
+    // camera.updateProjectionMatrix()
+    // renderer.setSize(window.innerWidth, window.innerHeight)
+    //
+    // trackFace();
+    init();
+    render();
 }
 
 function updateSmile(params) {
@@ -587,17 +689,17 @@ function updateSmile(params) {
 
 main();
 
-window.addEventListener(
-    'resize',
-    () => {
-        camera.aspect = window.innerWidth / window.innerHeight
-        camera.updateProjectionMatrix()
-        renderer.setSize(window.innerWidth, window.innerHeight)
-        // render()
-        renderer.render( scene, camera );
-    },
-    false
-)
+// window.addEventListener(
+//     'resize',
+//     () => {
+//         camera.aspect = window.innerWidth / window.innerHeight
+//         camera.updateProjectionMatrix()
+//         renderer.setSize(window.innerWidth, window.innerHeight)
+//         // render()
+//         renderer.render( scene, camera );
+//     },
+//     false
+// )
 
 // let num = 1;
 
@@ -609,52 +711,32 @@ window.addEventListener(
 //     num++;
 // });
 
-async function submitScore(score) {
-    const requestOptions = {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            "surveyId": "90110",
-            "score": String(score)
-        }),
-    };
-    const response = await fetch("http://localhost:3002/testrealput", requestOptions);
-
-    const json = await response.json()
-    console.log('json response:', json);
-}
-
-document.getElementById("capture").addEventListener("click", function() {
-    pause = true;
-    console.log('capture clicked');
-});
-document.getElementById("retry").addEventListener("click", function() {
-    pause = false;
-    trackFace();
-    console.log('retry clicked');
-});
-
-document.getElementById("submit").addEventListener("click", function() {
-    submitScore(String(smile_level));
-    console.log('submit clicked');
-});
-// document.getElementById("myBtn2").addEventListener("click", function() {
-//     // console.log('hi there')
-//     mesh.skeleton.bones[ 4 ].rotation.x = -0.1 * num;
-//     num++;
+// async function submitScore(score) {
+//     const requestOptions = {
+//         method: "PUT",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({
+//             "surveyId": "90110",
+//             "score": String(score)
+//         }),
+//     };
+//     const response = await fetch("http://localhost:3002/testrealput", requestOptions);
+//
+//     const json = await response.json()
+//     console.log('json response:', json);
+// }
+//
+// document.getElementById("capture").addEventListener("click", function() {
+//     pause = true;
+//     console.log('capture clicked');
 // });
-// document.getElementById("myBtn3").addEventListener("click", function() {
-//     // console.log('hi there')
-//     mesh.skeleton.bones[ 4 ].rotation.x = -0.1 * num;
-//     num++;
+// document.getElementById("retry").addEventListener("click", function() {
+//     pause = false;
+//     trackFace();
+//     console.log('retry clicked');
 // });
-// document.getElementById("myBtn4").addEventListener("click", function() {
-//     // console.log('hi there')
-//     mesh.skeleton.bones[ 4 ].rotation.x = -0.1 * num;
-//     num++;
-// });
-// document.getElementById("myBtn5").addEventListener("click", function() {
-//     // console.log('hi there')
-//     mesh.skeleton.bones[ 5 ].rotation.x = -0.1 * num;
-//     num++;
+//
+// document.getElementById("submit").addEventListener("click", function() {
+//     submitScore(String(smile_level));
+//     console.log('submit clicked');
 // });
