@@ -37,6 +37,32 @@ button {
 	z-index: 1; /* TODO Solve this in HTML */
 }
 
+#infobot {
+	/* background-color: red; */
+	position: absolute;
+	bottom: 0px;
+	right: 45%;
+	left: 45%;
+	width: 10%;
+	padding: 10px;
+	box-sizing: border-box;
+	text-align: center;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	pointer-events: none;
+	z-index: 1; /* TODO Solve this in HTML */
+}
+
+/* https://stackoverflow.com/questions/8446286/how-to-make-round-buttons */
+#roundbutton {
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    border: 1px solid #000;
+}
+
 a, button, input, select {
 	pointer-events: auto;
 }
