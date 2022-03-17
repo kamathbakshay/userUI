@@ -27,10 +27,14 @@ app.get('/thankyou', (req, res) => {
     res.sendfile(__dirname + '/public/thankyou.html');
 })
 
+// app.get('/survey', (req, res) => {
+//     const surveyId = req.query.surveyId;
+//     const question = req.query.question;
+//     res.render(__dirname + "/public/survey.html", {question:question, surveyId:surveyId});
+// })
 app.get('/survey', (req, res) => {
     const surveyId = req.query.surveyId;
-    const question = req.query.question;
-    res.render(__dirname + "/public/survey.html", {question:question, surveyId:surveyId});
+    res.render(__dirname + "/public/index.html", {surveyId:surveyId});
 })
 
 app.get('/passVar', function(req, res) {

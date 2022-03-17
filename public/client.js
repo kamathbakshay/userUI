@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 
@@ -68,12 +68,12 @@ function init() {
   renderer.outputEncoding = THREE.sRGBEncoding;
   container.appendChild( renderer.domElement );
 
-  const controls = new OrbitControls( camera, renderer.domElement );
-  controls.addEventListener( 'change', render ); // use if there is no animation loop
-  controls.minDistance = 2;
-  controls.maxDistance = 10;
-  controls.target.set( 0, 0, - 0.2 );
-  controls.update();
+  // const controls = new OrbitControls( camera, renderer.domElement );
+  // controls.addEventListener( 'change', render ); // use if there is no animation loop
+  // controls.minDistance = 2;
+  // controls.maxDistance = 10;
+  // controls.target.set( 0, 0, - 0.2 );
+  // controls.update();
 
   window.addEventListener( 'resize', onWindowResize );
 
@@ -230,7 +230,28 @@ async function trackFace() {
     requestAnimationFrame( trackFace );
 }
 
+async function getQuestion(surveyId) {
+    const responsejson = await fetch(
+        "https://lb.anonsurvey.xyz/proxy/getQuestion?surveyId=" + surveyId
+    );
+
+    const data = await responsejson.json()
+    console.log('json response:', data);
+
+    return data.result.question;
+}
+
+function setQuestion(question) {
+  document.getElementById("question").innerHTML = question
+}
+
+
 async function main() {
+    const surveyId = document.getElementById("surveyId").innerHTML;
+    console.log('surveyId:', surveyId);
+    const question = await getQuestion(surveyId);
+    console.log('question:', question);
+    setQuestion(question);
     await setupWebcam();
     const video = document.getElementById( "webcam" );
     video.play();
@@ -242,11 +263,6 @@ async function main() {
     render();
     trackFace();
 }
-
-function updateSmile(params) {
-    mesh.skeleton.bones[ 4 ].rotation.x = -0.1 * num;
-}
-
 
 main();
 
@@ -272,29 +288,29 @@ main();
 //     num++;
 // });
 
-// async function submitScore(score) {
-//     const requestOptions = {
-//         method: "PUT",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({
-//             "surveyId": "90110",
-//             "score": String(score)
-//         }),
-//     };
-//     const response = await fetch("http://localhost:3002/testrealput", requestOptions);
-//
-//     const json = await response.json()
-//     console.log('json response:', json);
-// }
-//
+async function submitScore(score) {
+    const requestOptions = {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            "surveyId": "90110",
+            "score": String(score)
+        }),
+    };
+    const response = await fetch("https://lb.anonsurvey.xyz/proxy/testrealput", requestOptions);
+
+    const json = await response.json()
+    console.log('json response:', json);
+}
+
 document.getElementById("capture").addEventListener("click", function(x) {
     pause = true;
     document.getElementById("capture").disabled = true;
     document.getElementById("submit").disabled = false;
     document.getElementById("retry").disabled = false;
     console.log('capture clicked');
-
 });
+
 document.getElementById("retry").addEventListener("click", function() {
     pause = false;
     document.getElementById("capture").disabled = false;
@@ -303,8 +319,9 @@ document.getElementById("retry").addEventListener("click", function() {
     trackFace();
     console.log('retry clicked');
 });
-//
+
 document.getElementById("submit").addEventListener("click", function() {
-    submitScore(String(smile_level));
+    submitScore(String(3));
     console.log('submit clicked');
+    location.href = "/thankyou";
 });
