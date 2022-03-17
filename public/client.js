@@ -18,6 +18,7 @@ let pause = false;
 let smile_level = 1;
 let mediapipe = null;
 let material = null, geometry = null;
+let skull = null;
 
 var map = {
     'sad': 0,
@@ -52,8 +53,9 @@ function init() {
       const loader = new GLTFLoader().setPath( '/model/' );
       loader.load( 'skull6.6.glb', function ( gltf ) {
         model = gltf.scene;
-        let skull = model.getObjectByName('skull');
-        console.log('skull:', skull);
+        skull = model.getObjectByName('skull');
+        skull.morphTargetInfluences[map['sad']] = 0;
+        skull.morphTargetInfluences[map['smile']] = 0;
         scene.add( gltf.scene );
         render();
       });
@@ -209,20 +211,24 @@ async function trackFace() {
     console.log('x:', x);
     if(x <= 7) {
         // sad
-        smile.morphTargetInfluences[map['sad']] = 1;
-        smile.morphTargetInfluences[map['smile']] = 0;
+        skull.morphTargetInfluences[map['sad']] = 1;
+        skull.morphTargetInfluences[map['smile']] = 0;
+        skull.morphTargetInfluences[map['eye_socket1']] = 1;
+        skull.morphTargetInfluences[map['eye_socket2']] = 0;
         // smile.morphTargetInfluences[3] = 1;
         // smile_level = 1;
     } else if(x <= 14) {
         //smile
-        // smile.morphTargetInfluences[1] = 0;
-        // smile.morphTargetInfluences[2] = 0;
-        // smile.morphTargetInfluences[3] = 1;
-        // smile_level = 2;
+        skull.morphTargetInfluences[map['sad']] = 0;
+        skull.morphTargetInfluences[map['smile']] = 0;
+        skull.morphTargetInfluences[map['eye_socket1']] = 0.5;
+        skull.morphTargetInfluences[map['eye_socket2']] = 0;
     } else if(x <= 21) {
         //smile more
-        smile.morphTargetInfluences[map['smile']] = 1;
-        smile.morphTargetInfluences[map['sad']] = 0;
+        skull.morphTargetInfluences[map['sad']] = 0;
+        skull.morphTargetInfluences[map['smile']] = 1;
+        skull.morphTargetInfluences[map['eye_socket1']] = 0;
+        skull.morphTargetInfluences[map['eye_socket2']] = 0;
         // smile.morphTargetInfluences[3] = 1;
         // smile_level = 3;
     }
@@ -323,5 +329,5 @@ document.getElementById("retry").addEventListener("click", function() {
 document.getElementById("submit").addEventListener("click", function() {
     submitScore(String(3));
     console.log('submit clicked');
-    location.href = "/thankyou";
+    // location.href = "/thankyou";
 });
