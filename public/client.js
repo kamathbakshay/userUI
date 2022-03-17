@@ -19,6 +19,8 @@ let smile_level = 1;
 let mediapipe = null;
 let material = null, geometry = null;
 let skull = null;
+let surveyId = null;
+let score = 2;
 
 var map = {
     'sad': 0,
@@ -57,7 +59,7 @@ function init() {
         skull.morphTargetInfluences[map['sad']] = 0;
         skull.morphTargetInfluences[map['smile']] = 0;
         scene.add( gltf.scene );
-        trackFace();        
+        trackFace();
       });
 
     });
@@ -215,22 +217,21 @@ async function trackFace() {
         skull.morphTargetInfluences[map['smile']] = 0;
         skull.morphTargetInfluences[map['eye_socket1']] = 1;
         skull.morphTargetInfluences[map['eye_socket2']] = 0;
-        // smile.morphTargetInfluences[3] = 1;
-        // smile_level = 1;
+        score = 1;
     } else if(x <= 14) {
         //smile
         skull.morphTargetInfluences[map['sad']] = 0;
         skull.morphTargetInfluences[map['smile']] = 0;
         skull.morphTargetInfluences[map['eye_socket1']] = 0.5;
         skull.morphTargetInfluences[map['eye_socket2']] = 0;
+        score = 2;
     } else if(x <= 21) {
         //smile more
         skull.morphTargetInfluences[map['sad']] = 0;
         skull.morphTargetInfluences[map['smile']] = 1;
         skull.morphTargetInfluences[map['eye_socket1']] = 0;
         skull.morphTargetInfluences[map['eye_socket2']] = 0;
-        // smile.morphTargetInfluences[3] = 1;
-        // smile_level = 3;
+        score = 3;
     }
     // setSmileLevel(String(smile_level));
     requestAnimationFrame( trackFace );
@@ -253,7 +254,7 @@ function setQuestion(question) {
 
 
 async function main() {
-    const surveyId = document.getElementById("surveyId").innerHTML;
+    surveyId = document.getElementById("surveyId").innerHTML;
     console.log('surveyId:', surveyId);
     const question = await getQuestion(surveyId);
     console.log('question:', question);
@@ -298,7 +299,7 @@ async function submitScore(score) {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            "surveyId": "90110",
+            "surveyId": String(surveyId),
             "score": String(score)
         }),
     };
@@ -326,7 +327,7 @@ document.getElementById("retry").addEventListener("click", function() {
 });
 
 document.getElementById("submit").addEventListener("click", function() {
-    submitScore(String(3));
+    submitScore(score);
     console.log('submit clicked');
-    // location.href = "/thankyou";
+    location.href = "/thankyou";
 });
