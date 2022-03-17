@@ -57,7 +57,7 @@ function init() {
         skull.morphTargetInfluences[map['sad']] = 0;
         skull.morphTargetInfluences[map['smile']] = 0;
         scene.add( gltf.scene );
-        render();
+        trackFace();        
       });
 
     });
@@ -267,7 +267,6 @@ async function main() {
     );
     init();
     render();
-    trackFace();
 }
 
 main();
