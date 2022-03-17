@@ -31,11 +31,12 @@ loader.crossOrigin = '';
 
 function init() {
 
-  const container = document.createElement( 'div' );
+  // const container = document.createElement( 'div' );
+  const container = document.getElementById( "container" )
   document.body.appendChild( container );
 
   camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
-  camera.position.set( 0, 0, 10 );
+  camera.position.set( 0, 0, 9.5 );
 
   scene = new THREE.Scene();
   scene.background = new THREE.Color( 0xbbbbbb );
@@ -49,7 +50,7 @@ function init() {
       render();
 
       const loader = new GLTFLoader().setPath( '/model/' );
-      loader.load( 'skull5.1.glb', function ( gltf ) {
+      loader.load( 'skull6.6.glb', function ( gltf ) {
         model = gltf.scene;
         let skull = model.getObjectByName('skull');
         console.log('skull:', skull);
@@ -153,8 +154,17 @@ function f(x, mean) {
     return ans.toFixed(10);
 }
 
+// function isLoading(visible=true) {
+//   var x = document.getElementById("loader");
+//   if(visible) {
+//     x.style.display = "block";
+//   } else {
+//     x.style.display = "none";
+//   }
+// }
+
 async function trackFace() {
-    // if(pause == true) return;
+    if(pause == true) return;
     if(!model) {
       console.log('model not ready');
       requestAnimationFrame( trackFace );
@@ -216,43 +226,6 @@ async function trackFace() {
         // smile.morphTargetInfluences[3] = 1;
         // smile_level = 3;
     }
-
-    // setSmileLevel(String(smile_level));
-
-    // let xx = 0;
-    // xx = (lip_h/face_h)*200;
-    // xx = lip_h - 47
-    // console.log('xx:', xx);
-
-
-    // let yy = 0;
-    // yy = f(lip_v, 10)*200;
-    // console.log('yy:', yy);
-    // let res = xx + yy;
-    // console.log('xy:', res);
-
-    // if(res <= 8) {
-    //     console.log('smile level: 1');
-    //     // smile_level = 1;
-    // } else if(res <= 16) {
-    //     console.log('smile level: 2');
-    //     // smile_level = 2;
-    // } else if(res <= 24) {
-    //     console.log('smile level: 3');
-    //     // smile_level = 3;
-    // } else if(res <= 32) {
-    //     console.log('smile level: 4');
-    //     // smile_level = 4;
-    // } else {
-    //     console.log('smile level: 5');
-    //     // smile_level = 5;
-    // }
-
-    // let yy = lip_v;
-    // console.log('yy:', yy);
-    //
-    // console.log('xy:', (xx+yy));
-
     // setSmileLevel(String(smile_level));
     requestAnimationFrame( trackFace );
 }
@@ -314,17 +287,24 @@ main();
 //     console.log('json response:', json);
 // }
 //
-// document.getElementById("capture").addEventListener("click", function() {
-//     pause = true;
-//     console.log('capture clicked');
-// });
-// document.getElementById("retry").addEventListener("click", function() {
-//     pause = false;
-//     trackFace();
-//     console.log('retry clicked');
-// });
+document.getElementById("capture").addEventListener("click", function(x) {
+    pause = true;
+    document.getElementById("capture").disabled = true;
+    document.getElementById("submit").disabled = false;
+    document.getElementById("retry").disabled = false;
+    console.log('capture clicked');
+
+});
+document.getElementById("retry").addEventListener("click", function() {
+    pause = false;
+    document.getElementById("capture").disabled = false;
+    document.getElementById("submit").disabled = true;
+    document.getElementById("retry").disabled = true;
+    trackFace();
+    console.log('retry clicked');
+});
 //
-// document.getElementById("submit").addEventListener("click", function() {
-//     submitScore(String(smile_level));
-//     console.log('submit clicked');
-// });
+document.getElementById("submit").addEventListener("click", function() {
+    submitScore(String(smile_level));
+    console.log('submit clicked');
+});
