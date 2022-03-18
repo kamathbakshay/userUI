@@ -117,7 +117,7 @@ function drawPoint( ctx, x, y, color) {
     ctx.fill();
 }
 
-async function setupWebcam() {
+function setupWebcam() {
     return new Promise( ( resolve, reject ) => {
         const webcamElement = document.getElementById( "webcam" );
         const navigatorAny = navigator;
@@ -168,6 +168,9 @@ function f(x, mean) {
 // }
 
 async function trackFace() {
+    var vid = document.getElementById("webcam");
+    console.log('video height:', vid.videoHeight); // returns the intrinsic height of the video
+    console.log('video width :', vid.videoWidth);
     if(pause == true) return;
     if(!model) {
       console.log('model not ready');
@@ -198,6 +201,9 @@ async function trackFace() {
     let face = faces[0];
 
     d = distance(face.mesh[13], face.mesh[14]);
+    console.log("13 pt->:", face.mesh[13]);
+    // console.log("13 pt->:",)
+
 
     lip_h = distance(face.mesh[61], face.mesh[291]);
     console.log('lip_h:', lip_h);
@@ -208,24 +214,55 @@ async function trackFace() {
     lip_v = distance(face.mesh[13], face.mesh[14]);
     console.log('lip_v:', lip_v);
 
-    let smile = model.getObjectByName( 'skull' );
-    let x = lip_h - 47;
+// //basic verstion
+//     let smile = model.getObjectByName( 'skull' );
+//     let x = lip_h - 47;
+//     console.log('x:', x);
+//     if(x <= 7) {
+//         // sad
+//         skull.morphTargetInfluences[map['sad']] = 1;
+//         skull.morphTargetInfluences[map['smile']] = 0;
+//         skull.morphTargetInfluences[map['eye_socket1']] = 1;
+//         skull.morphTargetInfluences[map['eye_socket2']] = 0;
+//         score = 1;
+//     } else if(x <= 14) {
+//         //smile
+//         skull.morphTargetInfluences[map['sad']] = 0;
+//         skull.morphTargetInfluences[map['smile']] = 0;
+//         skull.morphTargetInfluences[map['eye_socket1']] = 0.5;
+//         skull.morphTargetInfluences[map['eye_socket2']] = 0;
+//         score = 2;
+//     } else if(x <= 21) {
+//         //smile more
+//         skull.morphTargetInfluences[map['sad']] = 0;
+//         skull.morphTargetInfluences[map['smile']] = 1;
+//         skull.morphTargetInfluences[map['eye_socket1']] = 0;
+//         skull.morphTargetInfluences[map['eye_socket2']] = 0;
+//         score = 3;
+//     }
+//basic verstion
+    console.log('lip_h/face_h:', lip_h/face_h);
+    let x = (lip_h/face_h) * 100 - 35;
     console.log('x:', x);
-    if(x <= 7) {
+
+    // let smile = model.getObjectByName( 'skull' );
+    // let x = lip_h - 47;
+    // console.log('x:', x);
+    if(x <= 17/3) {
         // sad
         skull.morphTargetInfluences[map['sad']] = 1;
         skull.morphTargetInfluences[map['smile']] = 0;
         skull.morphTargetInfluences[map['eye_socket1']] = 1;
         skull.morphTargetInfluences[map['eye_socket2']] = 0;
         score = 1;
-    } else if(x <= 14) {
+    } else if(x <= 17/3*2) {
         //smile
         skull.morphTargetInfluences[map['sad']] = 0;
         skull.morphTargetInfluences[map['smile']] = 0;
         skull.morphTargetInfluences[map['eye_socket1']] = 0.5;
         skull.morphTargetInfluences[map['eye_socket2']] = 0;
         score = 2;
-    } else if(x <= 21) {
+    } else if(x <= 17) {
         //smile more
         skull.morphTargetInfluences[map['sad']] = 0;
         skull.morphTargetInfluences[map['smile']] = 1;
@@ -233,7 +270,6 @@ async function trackFace() {
         skull.morphTargetInfluences[map['eye_socket2']] = 0;
         score = 3;
     }
-    // setSmileLevel(String(smile_level));
     requestAnimationFrame( trackFace );
 }
 
@@ -254,12 +290,12 @@ function setQuestion(question) {
 
 
 async function main() {
+    setupWebcam();
     surveyId = document.getElementById("surveyId").innerHTML;
     console.log('surveyId:', surveyId);
     const question = await getQuestion(surveyId);
     console.log('question:', question);
     setQuestion(question);
-    await setupWebcam();
     const video = document.getElementById( "webcam" );
     video.play();
 
