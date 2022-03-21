@@ -117,7 +117,7 @@ function drawPoint( ctx, x, y, color) {
     ctx.fill();
 }
 
-function setupWebcam() {
+async function setupWebcam() {
     return new Promise( ( resolve, reject ) => {
         const webcamElement = document.getElementById( "webcam" );
         const navigatorAny = navigator;
@@ -290,7 +290,7 @@ function setQuestion(question) {
 
 
 async function main() {
-    setupWebcam();
+    await setupWebcam();
     surveyId = document.getElementById("surveyId").innerHTML;
     console.log('surveyId:', surveyId);
     const question = await getQuestion(surveyId);
