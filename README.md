@@ -8,3 +8,6 @@ $npm start
 
 both server should be on at the same time i.e on port 3000 & 3002
 
+
+run directly using: http://localhost:3000/survey?surveyId=76891
+
