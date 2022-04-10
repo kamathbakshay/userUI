@@ -1,11 +1,68 @@
 body {
 	margin: 0;
-	background-color: #000;
+	background-color: #fff;
 	color: #fff;
 	font-family: Monospace;
 	font-size: 13px;
 	line-height: 24px;
 	overscroll-behavior: none;
+}
+
+ul.images {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  width: 900px;
+  overflow-x: auto;
+}
+
+ul.images li {
+  flex: 0 0 auto;
+  width: 150px;
+  height: 150px;
+}
+
+.column {
+  float: left;
+  width: 25%;
+  padding: 5px;
+}
+
+/* Clearfix (clear floats) */
+.row::after {
+}
+
+td:nth-child(1) {
+  width: 100px;
+  /* background: #ddd; */
+  }
+
+/* the second */
+td:nth-child(2) {
+  width: 10%;
+  /* background: #ccc; */
+}
+
+.image-container {
+  /* width: 100%; */
+  text-align: center;
+	max-width:80px;
+	max-height:80px;
+}
+
+.image-conteiner img {
+  width: 100%;
+  height: auto;
+
+}
+
+.center {
+  display: block;
+	margin-left: auto;
+  margin-right: auto;
+	/* margin-top: 50%; */
+  width: 50%;
 }
 
 .loader{

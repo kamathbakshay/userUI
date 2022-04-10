@@ -79,7 +79,7 @@ function init() {
   // controls.target.set( 0, 0, - 0.2 );
   // controls.update();
 
-  window.addEventListener( 'resize', onWindowResize );
+  // window.addEventListener( 'resize', onWindowResize );
 
 }
 
@@ -88,7 +88,7 @@ function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize( window.innerWidth, window.innerHeight );
-  render();
+  // render();
 }
 
 function render() {
@@ -168,21 +168,11 @@ function f(x, mean) {
 // }
 
 async function trackFace() {
-    var vid = document.getElementById("webcam");
-    console.log('video height:', vid.videoHeight); // returns the intrinsic height of the video
-    console.log('video width :', vid.videoWidth);
     if(pause == true) return;
-    if(!model) {
-      console.log('model not ready');
-      requestAnimationFrame( trackFace );
-      return;
-    } else {
-      console.log('model is ready');
-    }
 
     const video = document.querySelector( "video" );
 
-    render()
+    // render()
 
     const faces = await mediapipe.estimateFaces( {
         input: video,
@@ -201,9 +191,7 @@ async function trackFace() {
     let face = faces[0];
 
     d = distance(face.mesh[13], face.mesh[14]);
-    console.log("13 pt->:", face.mesh[13]);
-    // console.log("13 pt->:",)
-
+    // console.log("13 pt->:", face.mesh[13]);
 
     lip_h = distance(face.mesh[61], face.mesh[291]);
     console.log('lip_h:', lip_h);
@@ -248,26 +236,18 @@ async function trackFace() {
     // let smile = model.getObjectByName( 'skull' );
     // let x = lip_h - 47;
     // console.log('x:', x);
+    var img = document.getElementById('myImage')
     if(x <= 17/3) {
         // sad
-        skull.morphTargetInfluences[map['sad']] = 1;
-        skull.morphTargetInfluences[map['smile']] = 0;
-        skull.morphTargetInfluences[map['eye_socket1']] = 1;
-        skull.morphTargetInfluences[map['eye_socket2']] = 0;
+        img.src = 'images/bar1.png'
         score = 1;
     } else if(x <= 17/3*2) {
         //smile
-        skull.morphTargetInfluences[map['sad']] = 0;
-        skull.morphTargetInfluences[map['smile']] = 0;
-        skull.morphTargetInfluences[map['eye_socket1']] = 0.5;
-        skull.morphTargetInfluences[map['eye_socket2']] = 0;
+        img.src = 'images/bar2.png'
         score = 2;
     } else if(x <= 17) {
         //smile more
-        skull.morphTargetInfluences[map['sad']] = 0;
-        skull.morphTargetInfluences[map['smile']] = 1;
-        skull.morphTargetInfluences[map['eye_socket1']] = 0;
-        skull.morphTargetInfluences[map['eye_socket2']] = 0;
+        img.src = 'images/bar3.png'
         score = 3;
     }
     requestAnimationFrame( trackFace );
@@ -302,8 +282,9 @@ async function main() {
     mediapipe = await faceLandmarksDetection.load(
         faceLandmarksDetection.SupportedPackages.mediapipeFacemesh
     );
-    init();
-    render();
+    trackFace();
+    // init();
+    // render();
 }
 
 main();
