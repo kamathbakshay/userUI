@@ -17,7 +17,7 @@ body {
 
 .cont {
   width: 650px;
-  border: dashed blue 1px;
+  /* border: dashed blue 1px; */
 }
 
 .cont img {
@@ -65,7 +65,7 @@ button {
 }
 
 #infobot2 {
-	background-color: green;
+	/* background-color: green; */
 	position: absolute;
 	bottom: 70px;
 	width: 100%;
