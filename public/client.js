@@ -118,25 +118,28 @@ function drawPoint( ctx, x, y, color) {
     ctx.fill();
 }
 
-function setupWebcam() {
-    return new Promise( ( resolve, reject ) => {
-        const webcamElement = document.getElementById( "webcam" );
-        const navigatorAny = navigator;
-        navigator.getUserMedia = navigator.getUserMedia ||
-        navigatorAny.webkitGetUserMedia || navigatorAny.mozGetUserMedia ||
-        navigatorAny.msGetUserMedia;
-        if( navigator.getUserMedia ) {
-            navigator.getUserMedia( { video: true },
-                stream => {
-                    webcamElement.srcObject = stream;
-                    webcamElement.addEventListener( "loadeddata", resolve, false );
+async function setupWebcam() {
+    return new Promise((resolve, reject) => {
+        const webcamElement = document.getElementById('webcam')
+        const navigatorAny = navigator
+        navigator.getUserMedia =
+            navigator.getUserMedia ||
+            navigatorAny.webkitGetUserMedia ||
+            navigatorAny.mozGetUserMedia ||
+            navigatorAny.msGetUserMedia
+        if (navigator.getUserMedia) {
+            navigator.getUserMedia(
+                { video: true },
+                (stream) => {
+                    webcamElement.srcObject = stream
+                    webcamElement.addEventListener('loadeddata', resolve, false)
                 },
-            error => reject());
+                (error) => reject()
+            )
+        } else {
+            reject()
         }
-        else {
-            reject();
-        }
-    });
+    })
 }
 
 function distance(p1, p2) {
@@ -271,7 +274,7 @@ function setQuestion(question) {
 
 
 async function main() {
-    setupWebcam();
+    await setupWebcam();
     surveyId = document.getElementById("surveyId").innerHTML;
     console.log('surveyId:', surveyId);
     const question = await getQuestion(surveyId);
