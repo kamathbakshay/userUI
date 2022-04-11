@@ -21,6 +21,7 @@ let material = null, geometry = null;
 let skull = null;
 let surveyId = null;
 let score = 2;
+let avatar = 'bunny';
 
 var map = {
     'sad': 0,
@@ -239,15 +240,15 @@ async function trackFace() {
     var img = document.getElementById('myImage')
     if(x <= 17/3) {
         // sad
-        img.src = 'images/bar1.png'
+        img.src = 'images/' + avatar + '1.png'
         score = 1;
     } else if(x <= 17/3*2) {
         //smile
-        img.src = 'images/bar2.png'
+        img.src = 'images/' + avatar + '2.png'
         score = 2;
     } else if(x <= 17) {
         //smile more
-        img.src = 'images/bar3.png'
+        img.src = 'images/' + avatar + '3.png'
         score = 3;
     }
     requestAnimationFrame( trackFace );
@@ -332,6 +333,16 @@ document.getElementById("capture").addEventListener("click", function(x) {
     document.getElementById("submit").disabled = false;
     document.getElementById("retry").disabled = false;
     console.log('capture clicked');
+});
+
+document.getElementById("avatar").addEventListener("click", function(x) {
+    if(avatar == 'bunny') {
+      avatar = 'hector';
+      console.log('avatar changed to hector');
+    } else {
+      avatar = 'bunny';
+      console.log('avatar changed to bunny');
+    }
 });
 
 document.getElementById("retry").addEventListener("click", function() {
